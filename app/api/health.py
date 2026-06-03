@@ -1,5 +1,3 @@
-"""Health check endpoint for monitoring and container orchestration."""
-
 from fastapi import APIRouter
 
 router = APIRouter(tags=["health"])

@@ -1,3 +1,5 @@
+"""Service configuration loaded from environment variables."""
+
 from importlib.metadata import PackageNotFoundError, version
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
