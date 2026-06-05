@@ -9,8 +9,8 @@ from app.main import app
 
 @pytest.fixture(name="fake_redis")
 def fixture_fake_redis():
-    """Create a fakeredis instance for testing."""
-    return fakeredis.aioredis.FakeRedis(decode_responses=True)
+    """Create a fakeredis instance shared across a single test."""
+    return fakeredis.aioredis.FakeRedis(decode_responses=True, connected=True)
 
 
 @pytest.fixture(autouse=True)
@@ -21,6 +21,7 @@ def _mock_redis_lifecycle(fake_redis):
         patch("app.main.close_redis", new_callable=AsyncMock),
         patch("app.main.start_consumer", new_callable=AsyncMock),
         patch("app.redis_client._redis", fake_redis),
+        patch("app.api.websocket.get_redis", return_value=fake_redis),
     ):
         yield
 

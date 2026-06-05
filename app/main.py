@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.api.health import router as health_router
+from app.api.websocket import router as ws_router
 from app.kafka.consumer import start_consumer
 from app.redis_client import get_redis, close_redis
 
@@ -39,6 +40,7 @@ app = FastAPI(
 )
 
 app.include_router(health_router)
+app.include_router(ws_router)
 
 
 @app.get("/")
