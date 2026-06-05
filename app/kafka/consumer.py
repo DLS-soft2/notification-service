@@ -1,26 +1,16 @@
 import asyncio
 import json
 import logging
-from datetime import datetime, timezone
-from uuid import uuid4
 
 from aiokafka import AIOKafkaConsumer
 import redis.asyncio as aioredis
 
 from app.config import settings
-from app.models.notifications import Notification
 from app.redis_client import get_redis
+from app.service.idempotency import is_duplicate
 from app.service.notification_service import dispatch_notification, format_notification
 
 logger = logging.getLogger(__name__)
-
-
-async def is_duplicate(event_id: str, redis_client: aioredis.Redis) -> bool:
-    """Atomically check and mark an event as processed. Returns True if already processed."""
-    key = f"idempotency:{event_id}"
-    result = await redis_client.set(key, "1", nx=True, ex=settings.idempotency_ttl_seconds)
-    # result is True if key was SET (new event), None if key already existed (duplicate)
-    return result is None
 
 
 async def handle_event(message_value: dict, redis_client: aioredis.Redis) -> None:
@@ -28,42 +18,26 @@ async def handle_event(message_value: dict, redis_client: aioredis.Redis) -> Non
 
     1. Extract event_id and event_type — skip if missing.
     2. Atomic idempotency check via is_duplicate — skip if already processed.
-    3. Extract customer_id — skip with warning if missing.
-    4. Format notification message — skip if unknown event type.
-    5. Dispatch to Redis pub/sub + history.
+    3. Format notification (returns None if customer_id missing or unknown event_type).
+    4. Dispatch to Redis pub/sub + history.
     """
     event_id = message_value.get("event_id")
     event_type = message_value.get("event_type")
-    customer_id = message_value.get("customer_id")
-    order_id = message_value.get("order_id")
 
     if not event_id or not event_type:
         logger.warning("Missing event_id or event_type — skipping")
         return
 
-    if await is_duplicate(event_id, redis_client):
+    if await is_duplicate(redis_client, str(event_id)):
         logger.info("Duplicate event %s — skipping", event_id)
         return
 
-    if not customer_id:
-        logger.warning("No customer_id in %s event %s — skipping notification", event_type, event_id)
+    notification = format_notification(event_type, message_value)
+    if notification is None:
+        logger.warning("Skipping event %s — unknown type or missing customer_id", event_id)
         return
 
-    message = format_notification(event_type, message_value)
-    if message is None:
-        logger.warning("Unknown event_type %s — skipping", event_type)
-        return
-
-    notification = Notification(
-        notification_id=str(uuid4()),
-        event_id=event_id,
-        order_id=order_id or "",
-        customer_id=customer_id,
-        event_type=event_type,
-        message=message,
-        timestamp=message_value.get("timestamp", datetime.now(timezone.utc).isoformat()),
-    )
-
+    customer_id = str(notification.customer_id)
     await dispatch_notification(customer_id, notification, redis_client)
     logger.info("Notification sent for %s event %s to customer %s", event_type, event_id, customer_id)
 
@@ -119,7 +93,7 @@ async def start_consumer() -> None:
 
     except asyncio.CancelledError:
         logger.info("Consumer task was cancelled")
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         logger.error("Consumer crashed with error: %s", exc, exc_info=True)
     finally:
         await consumer.stop()
