@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "notification-service"
+version = "1.0.0"
+description = "Kafka consumer that pushes real-time notifications via WebSocket"
+authors = ["Benjamin Harris <Benjamin-Harris@aintgivingmymailyo.com>"]
+license = ""
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+uvicorn = { extras = ["standard"], version = "^0.32.0" }
+pydantic-settings = "^2.13.1"
+aiokafka = "^0.13.0"
+redis = { extras = ["hiredis"], version = "^5.0.0" }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "pylint (>=4.0.5,<5.0.0)",
+    "pytest-asyncio (>=0.25.0)",
+    "fakeredis[lua] (>=2.26.0)",
+]
+
+[tool.pylint."messages_control"]
+disable = ["too-few-public-methods"]
+good-names = ["db"]
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
