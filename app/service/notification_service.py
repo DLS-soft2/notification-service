@@ -19,14 +19,16 @@ def format_notification(event_type: str, event_data: dict) -> Notification | Non
         return None
 
     customer_id = event_data.get("customer_id")
-    if not customer_id:
+    order_id = event_data.get("order_id")
+    event_id = event_data.get("event_id")
+    if not customer_id or not order_id or not event_id:
         return None
 
     message = template.format_map(defaultdict(str, event_data))
 
     return Notification(
-        event_id=UUID(str(event_data.get("event_id", ""))),
-        order_id=UUID(str(event_data.get("order_id", ""))),
+        event_id=UUID(str(event_id)),
+        order_id=UUID(str(order_id)),
         customer_id=UUID(str(customer_id)),
         event_type=event_type,
         message=message,

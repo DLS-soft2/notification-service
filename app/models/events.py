@@ -23,7 +23,7 @@ class PaymentAuthorized(BaseModel):
     event_type: str = "PaymentAuthorized"
     event_id: UUID = Field(default_factory=uuid4)
     order_id: UUID
-    customer_id: UUID | None = None
+    customer_id: UUID
     payment_id: UUID | None = None
     amount: float
     timestamp: datetime
@@ -35,7 +35,7 @@ class PaymentFailed(BaseModel):
     event_type: str = "PaymentFailed"
     event_id: UUID = Field(default_factory=uuid4)
     order_id: UUID
-    customer_id: UUID | None = None
+    customer_id: UUID
     reason: str
     timestamp: datetime
 
@@ -46,7 +46,7 @@ class RestaurantAccepted(BaseModel):
     event_type: str = "RestaurantAccepted"
     event_id: UUID = Field(default_factory=uuid4)
     order_id: UUID
-    customer_id: UUID | None = None
+    customer_id: UUID
     estimated_prep_time: int | None = None
     timestamp: datetime
 
@@ -57,8 +57,8 @@ class CourierAssigned(BaseModel):
     event_type: str = "CourierAssigned"
     event_id: UUID = Field(default_factory=uuid4)
     order_id: UUID
-    customer_id: UUID | None = None
-    courier_id: UUID | None = None
+    customer_id: UUID
+    courier_id: UUID
     timestamp: datetime
 
 
@@ -68,5 +68,5 @@ class DeliveryCompleted(BaseModel):
     event_type: str = "DeliveryCompleted"
     event_id: UUID = Field(default_factory=uuid4)
     order_id: UUID
-    customer_id: UUID | None = None
+    customer_id: UUID
     timestamp: datetime

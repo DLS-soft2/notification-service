@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from app.config import settings
 from app.api.health import router as health_router
 from app.kafka.consumer import start_consumer
-from app.redis_client import start_redis, stop_redis
+from app.redis_client import get_redis, close_redis
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     """Start Redis and Kafka consumer on startup; cancel and close on shutdown."""
-    await start_redis()
+    get_redis()
 
     consumer_task = asyncio.create_task(start_consumer())
     logger.info("Kafka consumer background task started")
@@ -28,7 +28,7 @@ async def lifespan(_app: FastAPI):
     except asyncio.CancelledError:
         logger.info("Kafka consumer task cancelled")
 
-    await stop_redis()
+    await close_redis()
 
 
 app = FastAPI(

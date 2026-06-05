@@ -24,7 +24,7 @@ def test_format_payment_authorized():
     """PaymentAuthorized produces the correct message."""
     result = format_notification("PaymentAuthorized", _base_event())
     assert isinstance(result, Notification)
-    assert result.message == "Payment confirmed — restaurant notified"
+    assert result.message == "Payment confirmed"
 
 
 def test_format_payment_failed():
@@ -64,5 +64,19 @@ def test_format_unknown_event_type():
 def test_format_missing_customer_id():
     """Missing customer_id returns None."""
     event = {"event_id": EVENT_ID, "order_id": ORDER_ID, "timestamp": TIMESTAMP}
+    result = format_notification("OrderCreated", event)
+    assert result is None
+
+
+def test_format_missing_order_id():
+    """Missing order_id returns None."""
+    event = {"event_id": EVENT_ID, "customer_id": CUSTOMER_ID, "timestamp": TIMESTAMP}
+    result = format_notification("OrderCreated", event)
+    assert result is None
+
+
+def test_format_missing_event_id():
+    """Missing event_id returns None."""
+    event = {"order_id": ORDER_ID, "customer_id": CUSTOMER_ID, "timestamp": TIMESTAMP}
     result = format_notification("OrderCreated", event)
     assert result is None

@@ -17,8 +17,8 @@ def fixture_fake_redis():
 def _mock_redis_lifecycle(fake_redis):
     """Replace Redis lifecycle, Kafka consumer, and get_redis with fakes for all tests."""
     with (
-        patch("app.main.start_redis", new_callable=AsyncMock),
-        patch("app.main.stop_redis", new_callable=AsyncMock),
+        patch("app.main.get_redis", return_value=fake_redis),
+        patch("app.main.close_redis", new_callable=AsyncMock),
         patch("app.main.start_consumer", new_callable=AsyncMock),
         patch("app.redis_client._redis", fake_redis),
     ):
