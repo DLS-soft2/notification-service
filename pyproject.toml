@@ -31,7 +31,7 @@ dev = [
 ignore-paths = ["tests/"]
 
 [tool.pylint."messages_control"]
-disable = ["too-few-public-methods"]
+disable = ["too-few-public-methods", "missing-module-docstring"]
 good-names = ["db"]
 
 [tool.pylint.format]
