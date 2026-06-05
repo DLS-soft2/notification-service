@@ -1,5 +1,3 @@
-"""Tests for Kafka consumer: handle_event, idempotency, and notification dispatch."""
-
 import json
 
 import pytest
