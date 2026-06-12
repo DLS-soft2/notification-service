@@ -22,6 +22,7 @@ def _mock_redis_lifecycle(fake_redis):
         patch("app.main.start_consumer", new_callable=AsyncMock),
         patch("app.redis_client._redis", fake_redis),
         patch("app.api.websocket.get_redis", return_value=fake_redis),
+        patch("app.api.receipts.get_redis", return_value=fake_redis),
     ):
         yield
 

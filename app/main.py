@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -7,8 +8,9 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.config import settings
 from app.api.health import router as health_router
+from app.api.receipts import router as receipts_router
 from app.api.websocket import router as ws_router
-from app.kafka.consumer import start_consumer
+from app.kafka.consumer import start_consumer, run_dispatch_job
 from app.redis_client import get_redis, close_redis
 
 logger = logging.getLogger(__name__)
@@ -42,6 +44,7 @@ app = FastAPI(
 Instrumentator().instrument(app).expose(app)
 
 app.include_router(health_router)
+app.include_router(receipts_router)
 app.include_router(ws_router)
 
 
@@ -52,3 +55,24 @@ def root():
         "service": settings.service_name,
         "version": settings.service_version,
     }
+
+
+async def _run_dispatch() -> None:
+    """Initialize Redis, run the dispatch job, then clean up."""
+    get_redis()
+    try:
+        await run_dispatch_job(settings)
+    finally:
+        await close_redis()
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    if settings.dispatch_mode:
+        logger.info("Starting in DISPATCH mode (finite Kafka drain)")
+        asyncio.run(_run_dispatch())
+        sys.exit(0)
+    else:
+        import uvicorn  # pylint: disable=import-outside-toplevel
+        uvicorn.run("app.main:app", host="0.0.0.0", port=8000)

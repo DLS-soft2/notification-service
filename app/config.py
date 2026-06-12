@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     kafka_topic_deliveries: str = "deliveries"
     kafka_group_id: str = "notification-service-group"
 
+    dispatch_mode: bool = False
+
     notification_history_max: int = 50
     idempotency_ttl_seconds: int = 86400
 
