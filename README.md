@@ -13,9 +13,9 @@ Kafka (5 topics) -> Consumer -> Idempotency Check (Redis SETNX) -> Format Notifi
 | Topic | Events |
 |-------|--------|
 | `orders` | OrderCreated |
-| `payments` | PaymentAuthorized, PaymentFailed |
-| `restaurants` | RestaurantAccepted |
-| `couriers` | CourierAssigned |
+| `payments` | PaymentAuthorized, PaymentFailed, PaymentRefunded |
+| `restaurants` | RestaurantAccepted, RestaurantRejected |
+| `couriers` | CourierAssigned, CourierAssignmentFailed |
 | `deliveries` | DeliveryCompleted |
 
 ## Endpoints
@@ -51,7 +51,7 @@ poetry run uvicorn app.main:app --reload
 ## Running Tests
 
 ```bash
-poetry run pytest --tb=short -v
+poetry run pytest --tb=short -v   # 28 tests
 ```
 
 ## Docker
