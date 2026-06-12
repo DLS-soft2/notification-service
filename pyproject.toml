@@ -13,6 +13,7 @@ uvicorn = { extras = ["standard"], version = "^0.32.0" }
 pydantic-settings = "^2.13.0"
 aiokafka = "^0.13.0"
 redis = { extras = ["hiredis"], version = "^5.0.0" }
+prometheus-fastapi-instrumentator = "^7.1.0"
 
 [build-system]
 requires = ["poetry-core"]
