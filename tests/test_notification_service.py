@@ -42,10 +42,11 @@ def test_format_restaurant_accepted():
 
 
 def test_format_courier_assigned():
-    """CourierAssigned produces the correct message."""
-    result = format_notification("CourierAssigned", _base_event())
+    """CourierAssigned includes the courier name in the message."""
+    result = format_notification("CourierAssigned", _base_event(courier_name="Ox"))
     assert isinstance(result, Notification)
-    assert result.message == "Courier on the way"
+    assert "Ox" in result.message
+    assert result.message == "Courier Ox is on the way!"
 
 
 def test_format_delivery_completed():

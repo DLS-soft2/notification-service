@@ -59,6 +59,7 @@ class CourierAssigned(BaseModel):
     order_id: UUID
     customer_id: UUID
     courier_id: UUID
+    courier_name: str | None = None
     timestamp: datetime
 
 
