@@ -70,3 +70,40 @@ class DeliveryCompleted(BaseModel):
     order_id: UUID
     customer_id: UUID
     timestamp: datetime
+
+
+class RestaurantRejected(BaseModel):
+    """Restaurant rejected the order."""
+
+    event_type: str = "RestaurantRejected"
+    event_id: UUID = Field(default_factory=uuid4)
+    order_id: UUID
+    customer_id: UUID
+    restaurant_id: UUID
+    reason: str
+    timestamp: datetime
+
+
+class CourierAssignmentFailed(BaseModel):
+    """No courier could be assigned to the order."""
+
+    event_type: str = "CourierAssignmentFailed"
+    event_id: UUID = Field(default_factory=uuid4)
+    order_id: UUID
+    customer_id: UUID
+    restaurant_id: UUID
+    reason: str
+    timestamp: datetime
+
+
+class PaymentRefunded(BaseModel):
+    """Payment was refunded for a cancelled order."""
+
+    event_type: str = "PaymentRefunded"
+    event_id: UUID = Field(default_factory=uuid4)
+    order_id: UUID
+    customer_id: UUID
+    payment_id: UUID
+    amount: float
+    reason: str
+    timestamp: datetime

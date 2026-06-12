@@ -5,4 +5,7 @@ EVENT_HANDLERS: dict[str, str] = {
     "RestaurantAccepted": "Restaurant is preparing your order (~{estimated_prep_time} min)",
     "CourierAssigned": "Courier on the way",
     "DeliveryCompleted": "Order delivered!",
+    "RestaurantRejected": "Order rejected by restaurant: {reason}",
+    "CourierAssignmentFailed": "No courier available: {reason}",
+    "PaymentRefunded": "Your payment has been refunded: {reason}",
 }

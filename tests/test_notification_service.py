@@ -80,3 +80,24 @@ def test_format_missing_event_id():
     event = {"order_id": ORDER_ID, "customer_id": CUSTOMER_ID, "timestamp": TIMESTAMP}
     result = format_notification("OrderCreated", event)
     assert result is None
+
+
+def test_format_restaurant_rejected():
+    """RestaurantRejected includes the rejection reason."""
+    result = format_notification("RestaurantRejected", _base_event(reason="Kitchen closed"))
+    assert isinstance(result, Notification)
+    assert "Kitchen closed" in result.message
+
+
+def test_format_courier_assignment_failed():
+    """CourierAssignmentFailed includes the failure reason."""
+    result = format_notification("CourierAssignmentFailed", _base_event(reason="No available couriers"))
+    assert isinstance(result, Notification)
+    assert "No available couriers" in result.message
+
+
+def test_format_payment_refunded():
+    """PaymentRefunded includes refund information."""
+    result = format_notification("PaymentRefunded", _base_event(reason="Order cancelled"))
+    assert isinstance(result, Notification)
+    assert "refund" in result.message.lower()
